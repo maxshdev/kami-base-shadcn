@@ -1,13 +1,15 @@
-// app/(public)/(auth)/login/page.tsx
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { toast } from "sonner"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+
+// Importamos el mock
+import { demoLogin } from "@/features/auth-mock";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,8 +18,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,49 +27,45 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: formData.email,
-          password: formData.password, 
-        }),
-      });
+      let user;
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Error al iniciar sesión");
+      if (!process.env.NEXT_PUBLIC_API_URL) {
+        // Si no hay API, usamos demo
+        user = await demoLogin(formData.email, formData.password);
+      } else {
+        // Si hay API, hacemos fetch real
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email, password: formData.password }),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Error al iniciar sesión");
+        }
+
+        const data = await res.json();
+        user = data.user;
       }
 
-      const { user } = await res.json();
+      // Guardar token y datos del usuario
+      localStorage.setItem("token", user.access_token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: user.name, email: user.email, role: user.role })
+      );
 
-      // Guardar token
-      localStorage.setItem('token', user.access_token);
+      toast("Inicio de sesión exitoso", { description: "Redirigiendo…" });
 
-      // Guardar datos del usuario (solo los que necesitás)
-      localStorage.setItem('user', JSON.stringify({
-        name: user.name,
-        email: user.email,
-        // avatar: "/avatars/default.jpg", // o podés modificar esto si viene desde el backend
-        role: user.role
-      }));
-
-      toast("Inicio de sesión exitoso", {
-        description: "Redirigiendo…",
-      });
-
-      router.push('/admin/dashboard');
-
+      router.push("/admin/dashboard");
     } catch (err: any) {
       setError(err.message);
-      toast("Error al iniciar sesión", {
-        description: err.message,
-      });
+      toast("Error al iniciar sesión", { description: err.message });
     } finally {
       setIsLoading(false);
     }
-  }
-
+  };
 
   return (
     <div className="max-w-md mx-auto p-6 space-y-6">
@@ -79,9 +77,7 @@ export default function LoginPage() {
       <Separator />
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+        {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="space-y-2">
           <Label htmlFor="email">Correo Electrónico</Label>
@@ -112,5 +108,5 @@ export default function LoginPage() {
         </Button>
       </form>
     </div>
-  )
+  );
 }

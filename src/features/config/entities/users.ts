@@ -1,29 +1,29 @@
-import type { EntityFeatureConfig, Action } from "@maxshdev/kami-engine/types/crud.types";
-import { enumToOptions } from "@maxshdev/kami-engine/helpers/crud.utils";
-import { EntityRole } from "./roles";
+export const EntityRole = {
+  ADMIN: "admin",
+  USER: "user",
+};
 
-// Ejemplo de acciones extra por fila
-const userExtraRowActions: Action<any>[] = [
-  { key: "other", label: "Otro", onClick: (user) => alert(`Ver usuario: ${user.name}`), permissionKey: "canPay" },
+// Acciones extra fila
+const userExtraRowActions = [
+  { key: "other", label: "Otro", onClick: (user: any) => alert(`Otras Opciones: ${user.name}`), permissionKey: "canCustom" },
 ];
 
-// Ejemplo de acciones de extra página (botones encima de la tabla)
-const userExtraPageActions: Action<any>[] = [
+// Acciones extra página
+const userExtraPageActions = [
   { key: "createUser", label: "Crear usuario", onClick: () => alert("Crear usuario"), permissionKey: "canCreate" },
-  { key: "setPay", label: "Establecer pago", onClick: () => alert("Establecer pago"), permissionKey: "canPay" },
+  { key: "setCustom", label: "Otras opciones", onClick: () => alert("Otras Opciones"), permissionKey: "canCustom" },
 ];
 
-export const usersConfig: EntityFeatureConfig<any> = {
-  entityName: "users", // TODO: chequear porque creo que está duplicado el uso con apiPath es lo mismo para usar rutas a menos que lo piense para otra cosa.
+export const usersConfig = {
+  entityName: "users",
   apiPath: "users",
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
+  baseUrl: "", // No hay API
   userData: undefined,
   columns: [
     { accessorKey: "name", header: "Nombre" },
     { accessorKey: "email", header: "Email" },
-    { accessorKey: "role", header: "Rol", type: "select", options: enumToOptions(EntityRole) },
+    { accessorKey: "role", header: "Rol", type: "select", options: Object.values(EntityRole) },
   ],
-  // si quieres puedes sobreescribir acciones por defecto con rowActions y pageActions
   extraRowActions: userExtraRowActions,
   extraPageActions: userExtraPageActions,
 };

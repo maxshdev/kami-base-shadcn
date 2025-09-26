@@ -1,8 +1,6 @@
-// web-ragemultiverse-admin\src\components\ui\data-table.tsx
 "use client"
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -22,15 +20,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "../ui/table";
+import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from "../ui/dropdown-menu";
+import { Input } from "../ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -45,9 +43,89 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // ========================
+  // Helper para formatear fechas
+  // ========================
+  const formatDate = (value: string | Date, type: "date" | "datetime") => {
+    if (!value) return "";
+    const date = new Date(value);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const day = pad(date.getDate());
+    const month = pad(date.getMonth() + 1);
+    const year = date.getFullYear();
+    if (type === "date") return `${day}/${month}/${year}`;
+    if (type === "datetime") {
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      const seconds = pad(date.getSeconds());
+      return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+    }
+  };
+
+  // ========================
+  // Columnas formateo de fechas
+  // ========================
+  const formatColumns = [
+    ...columns.map((col: any) => {
+      // Fechas
+      if (col.type === "date") return { ...col, cell: (info: any) => formatDate(info.getValue(), "date") };
+      if (col.type === "datetime") return { ...col, cell: (info: any) => formatDate(info.getValue(), "datetime") };
+
+      // JSON → mostrar claves activas como badges
+      if (col.type === "custom-actions") {
+        return {
+          ...col,
+          cell: (info: any) => {
+            const json: Record<string, boolean> = info.getValue() || {};
+            if (typeof json !== "object" || Object.keys(json).length === 0) return "-";
+
+            return (
+              <div className="flex gap-1 flex-wrap" title={JSON.stringify(json)}>
+                {Object.entries(json).map(([key, value]) => (
+                  <span
+                    key={key}
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${
+                      value
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-red-100 text-red-500"
+                    }`}
+                  >
+                    {key}
+                  </span>
+                ))}
+              </div>
+            );
+          },
+        };
+      }
+
+      // Boolean → mostrar checkbox read-only
+      if (col.type === "boolean" || col.type === "checkbox") {
+        return {
+          ...col,
+          cell: (info: any) => {
+            const value = info.getValue();
+            if (value === null || value === undefined) return "-";
+            return (
+              <input
+                type="checkbox"
+                checked={!!value}
+                readOnly
+                className="cursor-default"
+              />
+            );
+          },
+        };
+      }
+
+      return col;
+    }),
+  ];
+
   const table = useReactTable({
     data,
-    columns,
+    columns: formatColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
