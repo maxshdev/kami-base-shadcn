@@ -1,0 +1,74 @@
+{
+  "Public": {
+    "HomePage": {
+      "welcome": "Bienvenido a Kami Base",
+      "about": "Una solución integral lista para usar, que incluye un backoffice totalmente integrado, autenticación segura, gestión avanzada de usuarios y administración de roles y permisos."
+    },
+    "Header": {
+      "home": "Inicio",
+      "login": "Ingresar",
+      "register": "Registrarse",
+      "contact": "Contacto"
+    }
+  },
+  "Admin": {
+    "Conmon": {
+      "loading": "Cargando...",
+      "error": "Error",
+      "success": "Éxito",
+      "warning": "Advertencia",
+      "info": "Información",
+      "not_found": "No encontrado",
+      "unauthorized": "No autorizado",
+      "forbidden": "Prohibido",
+      "open_menu": "Abrir menú",
+      "actions": "Acciones",
+      "show": "Ver",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "Sidebar": {
+      "dashboard": "Tablero Principal",
+      "users_management": {
+        "title": "Gestión de Usuarios"
+      },
+      "cards_management": {
+        "title": "Gestión de Cartas"
+      },
+      "support": "Soporte",
+      "feedback": "Comentarios",
+      "faq": "Preguntas Frecuentes",
+      "profile": {
+        "upgrade_to_pro": "Actualizar a Pro",
+        "account_settings": "Configuración de Cuenta",
+        "billing": "Facturación",
+        "notifications": "Notificaciones",
+        "logout": "Cerrar Sesión"
+      },
+      "index": "Listado"
+    },
+    "Cards": {
+      "code": "Código",
+      "name": "Nombre",
+      "rarity": "Rareza",
+      "attribute": "Atributo",
+      "species": "Especie",
+      "cost": "Costo",
+      "version": "Versión",
+      "damage": "Daño",
+      "image": "Imagen",
+      "mission": "Misión",
+      "legend": "Leyenda",
+      "edit_card": "Editar carta",
+      "save": "Guardar",
+      "saving": "Guardando",
+      "loading": "Cargando"
+    },
+    "Users": {
+      "id": "ID",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "role": "Rol"
+    }
+  }
+}
